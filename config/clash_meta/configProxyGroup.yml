@@ -1,0 +1,479 @@
+######### 锚点 start #######
+
+#这里是订阅更新和延迟测试相关的
+p:
+  &p {
+    type: http,
+    interval: 3600,
+    health-check:
+      {
+        enable: true,
+        url: https://www.gstatic.com/generate_204,
+        interval: 300,
+      },
+  }
+
+proxyGroup: &proxyGroup 
+  - name: provider1-group
+    type: select
+    use:
+      - provider1
+
+proxyGroupname: &proxyGroupname
+  proxies: 
+    - 直连
+    - 自动选择
+    - 香港
+    - 台湾
+    - 日本
+    - 新加坡
+    - 美国
+    - 其它地区
+    - provider1-group
+
+
+######### 锚点 end #######
+
+# url 里填写自己的订阅,名称不能重复
+proxy-providers:
+  provider1:
+    <<: *p
+    url: ""
+
+# port: 7890 # HTTP(S) 代理服务器端口
+# socks-port: 7891 # SOCKS5 代理端口
+mixed-port: 10801 # HTTP(S) 和 SOCKS 代理混合端口
+# redir-port: 7892 # 透明代理端口，用于 Linux 和 MacOS
+
+allow-lan: true # 允许局域网连接
+bind-address: "*" # 绑定 IP 地址，仅作用于 allow-lan 为 true，'*'表示所有地址
+authentication: # http,socks 入口的验证用户名，密码
+  - "username:password"
+skip-auth-prefixes: # 设置跳过验证的 IP 段
+  - 127.0.0.1/8
+  - ::1/128
+lan-allowed-ips: # 允许连接的 IP 地址段，仅作用于 allow-lan 为 true, 默认值为 0.0.0.0/0 和::/0
+  - 0.0.0.0/0
+  - ::/0
+lan-disallowed-ips: # 禁止连接的 IP 地址段，黑名单优先级高于白名单，默认值为空
+  - 192.168.0.3/32
+
+#  find-process-mode has 3 values:always, strict, off
+#  - always, 开启，强制匹配所有进程
+#  - strict, 默认，由 mihomo 判断是否开启
+#  - off, 不匹配进程，推荐在路由器上使用此模式
+find-process-mode: strict
+
+mode: rule
+
+#自定义 geodata url
+geox-url:
+  geoip: "https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@release/geoip.dat"
+  geosite: "https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@release/geosite.dat"
+  mmdb: "https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@release/geoip.metadb"
+
+# geo-auto-update: false # 是否自动更新 geodata
+# geo-update-interval: 24 # 更新间隔，单位：小时
+
+log-level: debug # 日志等级 silent/error/warning/info/debug
+
+ipv6: true # 开启 IPv6 总开关，关闭阻断所有 IPv6 链接和屏蔽 DNS 请求 AAAA 记录
+
+# 目前仅用于 API 的 https
+tls:
+  certificate: string # 证书 PEM 格式，或者 证书的路径
+  private-key: string # 证书对应的私钥 PEM 格式，或者私钥路径
+  custom-certifactes:
+    - |
+      -----BEGIN CERTIFICATE-----
+      format/pem...
+      -----END CERTIFICATE-----
+
+external-controller: 0.0.0.0:9093 # RESTful API 监听地址
+external-controller-tls: 0.0.0.0:9443 # RESTful API HTTPS 监听地址，需要配置 tls 部分配置文件
+# secret: "123456" # `Authorization:Bearer ${secret}`
+
+# 配置 WEB UI 目录，使用 http://{{external-controller}}/ui 访问
+external-ui: /path/to/ui/folder/
+external-ui-name: xd
+external-ui-url: "https://github.com/MetaCubeX/metacubexd/archive/refs/heads/gh-pages.zip"
+
+# 更换延迟计算方式,去除握手等额外延迟
+unified-delay: false
+
+# TCP 并发连接所有 IP, 将使用最快握手的 TCP
+tcp-concurrent: true
+
+# 设置出口网卡
+# interface-name: en0 
+
+# 全局 TLS 指纹，优先低于 proxy 内的 client-fingerprint
+# 可选： "chrome","firefox","safari","ios","random","none" options.
+# Utls is currently support TLS transport in TCP/grpc/WS/HTTP for VLESS/Vmess and trojan.
+global-client-fingerprint: chrome
+
+#  TCP keep alive interval
+keep-alive-interval: 15
+
+# experimental:
+
+# 类似于 /etc/hosts, 仅支持配置单个 IP
+# hosts:
+# '*.mihomo.dev': 127.0.0.1
+# '.dev': 127.0.0.1
+# 'alpha.mihomo.dev': '::1'
+# test.com: [1.1.1.1, 2.2.2.2]
+# home.lan: lan # lan 为特别字段，将加入本地所有网卡的地址
+# baidu.com: google.com # 只允许配置一个别名
+
+profile: # 存储 select 选择记录
+  store-selected: false
+
+  # 持久化 fake-ip
+  store-fake-ip: true
+
+# Tun 配置
+tun:
+  enable: true
+  stack: mixed # gvisor/mixed
+  # dns-hijack:
+  #   - 0.0.0.0:53 # 需要劫持的 DNS
+  dns-hijack:
+    - any:53
+    - tcp://any:53
+  auto-detect-interface: true # 自动识别出口网卡
+  auto-route: true # 配置路由表
+  # mtu: 9000 # 最大传输单元
+  # gso: false # 启用通用分段卸载，仅支持 Linux
+  # gso-max-size: 65536 # 通用分段卸载包的最大大小
+  strict-route: true # 将所有连接路由到 tun 来防止泄漏，但你的设备将无法其他设备被访问
+  inet4-route-address: # 启用 auto-route 时使用自定义路由而不是默认路由
+    - 0.0.0.0/1
+    - 128.0.0.0/1
+  inet6-route-address: # 启用 auto-route 时使用自定义路由而不是默认路由
+    - "::/1"
+    - "8000::/1"
+  # endpoint-independent-nat: false # 启用独立于端点的 NAT
+  # include-interface: # 限制被路由的接口。默认不限制，与 `exclude-interface` 冲突
+  #   - "lan0"
+  # exclude-interface: # 排除路由的接口，与 `include-interface` 冲突
+  #   - "lan1"
+  # include-uid: # UID 规则仅在 Linux 下被支持，并且需要 auto-route
+  # - 0
+  # include-uid-range: # 限制被路由的的用户范围
+  # - 1000:9999
+  # exclude-uid: # 排除路由的的用户
+  #- 1000
+  # exclude-uid-range: # 排除路由的的用户范围
+  # - 1000:9999
+
+  # Android 用户和应用规则仅在 Android 下被支持
+  # 并且需要 auto-route
+
+  # include-android-user: # 限制被路由的 Android 用户
+  # - 0
+  # - 10
+  # include-package: # 限制被路由的 Android 应用包名
+  # - com.android.chrome
+  # exclude-package: # 排除被路由的 Android 应用包名
+  # - com.android.captiveportallogin
+
+#ebpf 配置
+# ebpf:
+#   auto-redir: # redirect 模式，仅支持 TCP
+#     - eth0
+#   redirect-to-tun: # UDP+TCP 使用该功能请勿启用 auto-route
+#     - eth0
+
+
+
+
+# 嗅探域名 可选配置
+sniffer:
+  enable: true
+  ## 对 redir-host 类型识别的流量进行强制嗅探
+  ## 如：Tun、Redir 和 TProxy 并 DNS 为 redir-host 皆属于
+  # force-dns-mapping: false
+  ## 对所有未获取到域名的流量进行强制嗅探
+  # parse-pure-ip: false
+  # 是否使用嗅探结果作为实际访问，默认 true
+  # 全局配置，优先级低于 sniffer.sniff 实际配置
+  override-destination: false
+  sniff: # TLS 和 QUIC 默认如果不配置 ports 默认嗅探 443
+    QUIC:
+     ports: [ 443 ]
+    TLS:
+     ports: [443, 8443]
+
+    # 默认嗅探 80
+    HTTP: # 需要嗅探的端口
+      ports: [80, 8080-8880]
+      # 可覆盖 sniffer.override-destination
+      override-destination: true
+  # 需要强制嗅探的域名
+  force-domain:
+    - +.v2ex.com
+  ## 对嗅探结果进行跳过
+  # skip-domain:
+  #   - Mijia Cloud
+  # 需要嗅探协议
+  # 已废弃，若 sniffer.sniff 配置则此项无效
+  # sniffing:
+  #   - tls
+  #   - http
+  # 强制对此域名进行嗅探
+
+  # 仅对白名单中的端口进行嗅探，默认为 443，80
+  # 已废弃，若 sniffer.sniff 配置则此项无效
+  # port-whitelist:
+  #   - "80"
+  #   - "443"
+    # - 8000-9999
+
+
+# DNS 配置
+dns:
+  cache-algorithm: arc
+  enable: false # 关闭将使用系统 DNS
+  # 开启 DoH 支持 HTTP/3，将并发尝试
+  prefer-h3: true 
+  listen: 0.0.0.0:53 # 开启 DNS 服务器监听
+  # false 将返回 AAAA 的空结果
+  ipv6: true
+  # ipv6-timeout: 300 # 单位：ms，内部双栈并发时，向上游查询 AAAA 时，等待 AAAA 的时间，默认 100ms
+  enhanced-mode: fake-ip
+  fake-ip-range: 198.18.0.1/16 # fake-ip 池设置
+  # 以下地址不会下发 fakeip 映射用于连接
+  fake-ip-filter:
+    - "*"
+    - "+.lan"
+    - "+.local"
+    - localhost.ptlogin2.qq.com
+  
+  # use-hosts: true # 查询 hosts
+
+  # 用于解析 nameserver，fallback 以及其他 DNS 服务器配置的，DNS 服务域名
+  # 只能使用纯 IP 地址，可使用加密 DNS
+  default-nameserver:
+    - 114.114.114.114 #114dns
+    - 119.29.29.29 #腾讯云
+    - 223.5.5.5 # 阿里云 
+    - system # append DNS server from system configuration. If not found, it would print an error log and skip.
+  # DNS 主要域名配置
+  # 支持 UDP，TCP，DoT，DoH，DoQ
+  # 这部分为主要 DNS 配置，影响所有直连，确保使用对大陆解析精准的 DNS
+  # 默认的域名解析服务器，如不配置 fallback/proxy-server-nameserver , 则所有域名都由 nameserver 解析
+  nameserver:
+    - "tls://dns.pub" #腾讯云
+    - "https://doh.pub/dns-query" #腾讯云
+    - "https://dns.alidns.com/dns-query#h3=true" # 强制 HTTP/3，与 perfer-h3 无关，强制开启 DoH 的 HTTP/3 支持，若不支持将无法使用
+    - "https://rubyfish.cn/dns-query" #红鱼
+    - "https://doh.360.cn/dns-query" #360
+    - "https://doh.sb/dns-query" #DNS.SB
+    - "https://doh-jp.blahdns.com/dns-query" #blahdns
+    - "https://doh-de.blahdns.com/dns-query" #blahdns
+  # 代理节点域名解析服务器，仅用于解析代理节点的域名 ,非必要配置项
+  proxy-server-nameserver:
+    - "https://doh.pub/dns-query"
+    # - https://dns.google/dns-query
+    # - tls://one.one.one.one
+  # 后备域名解析服务器，一般情况下使用境外 DNS, 保证结果可信
+  fallback:
+    - "tls://1.1.1.1:853" # cloudflare DNS over TLS
+    - "tls://8.8.8.8:853" # Google DNS over TLS
+    - "tls://8.8.4.4:853"
+    - "https://1.1.1.1/dns-query" # cloudflare DNS over HTTPS
+    - "https://1.0.0.1/dns-query"
+    - "https://dns.google/dns-query#dns" # Google DNS over HTTPS
+    - "https://dns.twnic.tw/dns-query#dns" #Quad 101
+    - "https://dns.adguard.com/dns-query#dns" #AdGuard
+    - "https://dns.quad9.net/dns-query#dns" #IBM-Quad9
+    - "https://doh.opendns.com/dns-query#dns" #OpenDNS
+  # 指定域名查询的解析服务器，可使用 geosite, 优先于 nameserver/fallback 查询
+  # 并发查询，无法保证顺序
+  nameserver-policy:
+    # 'www.baidu.com': '114.114.114.114'
+    # '+.internal.crop.com': '10.0.0.1'
+    "geosite:cn,private,apple":
+      - https://doh.pub/dns-query
+      - https://dns.alidns.com/dns-query
+    "geosite:category-ads-all": rcode://success
+    ## global，dns 为 rule-providers 中的名为 global 和 dns 规则订阅，
+    ## 且 behavior 必须为 domain/classical，当为 classical 时仅会生效域名类规则
+    "rule-set:cn,private":
+      - "https://doh.pub/dns-query"
+      - "https://dns.alidns.com/dns-query"
+    "rule-set:geolocation-!cn":
+      - "https://dns.cloudflare.com/dns-query#dns"
+      - "https://dns.google/dns-query#dns"
+  # 后备域名解析服务器筛选，满足条件的将使用 fallback结果或只使用 fallback解析
+  fallback-filter:
+    geoip: true
+    # 当 nameserver 域名的 IP 查询 geoip 库为 CN 时，不使用 fallback 中的 DNS 查询结果
+    geoip-code: CN
+    ipcidr:
+      - 240.0.0.0/4
+    domain:
+      - "+.google.com"
+      - "+.facebook.com"
+      - "+.youtube.com"
+
+proxies:
+  - name: "直连"
+    type: direct
+    udp: true
+
+proxy-groups:
+  - name: 🚀 节点选择
+    type: select
+    <<: *proxyGroupname
+  
+  - <<: *proxyGroup
+
+  - name: 🎯 全球直连
+    type: select
+    proxies: 
+    - DIRECT
+    - 🚀 节点选择
+
+  - name: 🛑 全球拦截
+    type: select
+    proxies:
+      - REJECT
+      - DIRECT
+
+  - name: 🐟 漏网之鱼
+    type: select
+    proxies:
+      - 🚀 节点选择
+      - DIRECT
+
+  - name: dns
+    type: select
+    proxies:
+      - 🚀 节点选择
+      - DIRECT
+
+  #分隔,下面是地区分组
+  - {
+      name: 自动选择,
+      type: url-test,
+      include-all-providers: true,
+      tolerance: 10,
+    }
+  - {
+      name: 香港,
+      type: select,
+      include-all-providers: true,
+      filter: "(?i)港|hk|hongkong|hong kong",
+    }
+  - {
+      name: 台湾,
+      type: select,
+      include-all-providers: true,
+      filter: "(?i)台|tw|taiwan",
+    }
+  - {
+      name: 日本,
+      type: select,
+      include-all-providers: true,
+      filter: "(?i)日|jp|japan",
+    }
+  - {
+      name: 美国,
+      type: select,
+      include-all-providers: true,
+      filter: "(?i)美|us|unitedstates|united states",
+    }
+  - {
+      name: 新加坡,
+      type: select,
+      include-all-providers: true,
+      filter: "(?i)(新|sg|singapore)",
+    }
+  - {
+      name: 其它地区,
+      type: select,
+      include-all-providers: true,
+      filter: "(?i)^(?!.*(?:🇭🇰|🇯🇵|🇺🇸|🇸🇬|🇨🇳|港|hk|hongkong|台|tw|taiwan|日|jp|japan|新|sg|singapore|美|us|unitedstates)).*",
+    }
+
+rules:
+  - GEOIP,lan,🎯 全球直连,no-resolve
+  - RULE-SET,github,🚀 节点选择
+  - RULE-SET,twitter,🚀 节点选择
+  - RULE-SET,youtube,🚀 节点选择
+  - RULE-SET,google,🚀 节点选择
+  - RULE-SET,telegram,🚀 节点选择
+  - RULE-SET,netflix,🚀 节点选择
+  - RULE-SET,spotify,🚀 节点选择
+  - RULE-SET,pixiv,🚀 节点选择
+  - RULE-SET,cn,🎯 全球直连
+  - RULE-SET,bilibili,🎯 全球直连
+  - RULE-SET,geolocation-!cn,🚀 节点选择
+
+  - RULE-SET,google_ip,🚀 节点选择
+  - RULE-SET,netflix_ip,🚀 节点选择
+  - RULE-SET,telegram_ip,🚀 节点选择
+  - RULE-SET,twitter_ip,🚀 节点选择
+  - RULE-SET,cn_ip,🎯 全球直连
+  - MATCH,🐟 漏网之鱼
+
+rule-anchor:
+  ip: &ip { type: http, interval: 86400, behavior: ipcidr, format: yaml }
+  domain:
+    &domain { type: http, interval: 86400, behavior: domain, format: yaml }
+
+rule-providers:
+  private:
+    <<: *domain
+    url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/private.yaml"
+  cn:
+    <<: *domain
+    url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/cn.yaml"
+  github:
+    <<: *domain
+    url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/github.yaml"
+  twitter:
+    <<: *domain
+    url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/twitter.yaml"
+  youtube:
+    <<: *domain
+    url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/youtube.yaml"
+  google:
+    <<: *domain
+    url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/google.yaml"
+  telegram:
+    <<: *domain
+    url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/telegram.yaml"
+  netflix:
+    <<: *domain
+    url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/netflix.yaml"
+  bilibili:
+    <<: *domain
+    url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/bilibili.yaml"
+  spotify:
+    <<: *domain
+    url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/spotify.yaml"
+  pixiv:
+    <<: *domain
+    url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/pixiv.yaml"
+  geolocation-!cn:
+    <<: *domain
+    url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/geolocation-!cn.yaml"
+
+  cn_ip:
+    <<: *ip
+    url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geoip/cn.yaml"
+  google_ip:
+    <<: *ip
+    url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geoip/google.yaml"
+  netflix_ip:
+    <<: *ip
+    url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geoip/netflix.yaml"
+  twitter_ip:
+    <<: *ip
+    url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geoip/twitter.yaml"
+  telegram_ip:
+    <<: *ip
+    url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geoip/telegram.yaml"
