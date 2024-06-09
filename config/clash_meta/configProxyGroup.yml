@@ -1,44 +1,15 @@
-######### 锚点 start #######
-
-#这里是订阅更新和延迟测试相关的
-p:
-  &p {
-    type: http,
-    interval: 3600,
-    health-check:
-      {
-        enable: true,
-        url: https://www.gstatic.com/generate_204,
-        interval: 300,
-      },
-  }
-
-proxyGroup: &proxyGroup 
-  - name: provider1-group
-    type: select
-    use:
-      - provider1
-
-proxyGroupname: &proxyGroupname
-  proxies: 
-    - 直连
-    - 自动选择
-    - 香港
-    - 台湾
-    - 日本
-    - 新加坡
-    - 美国
-    - 其它地区
-    - provider1-group
-
-
-######### 锚点 end #######
 
 # url 里填写自己的订阅,名称不能重复
 proxy-providers:
   provider1:
-    <<: *p
     url: ""
+    type: http
+    interval: 86400
+    health-check:
+        enable: true
+        interval: 3600
+        url: https://www.gstatic.com/generate_204
+    
 
 # port: 7890 # HTTP(S) 代理服务器端口
 # socks-port: 7891 # SOCKS5 代理端口
@@ -326,9 +297,21 @@ proxies:
 proxy-groups:
   - name: 🚀 节点选择
     type: select
-    <<: *proxyGroupname
+    proxies: 
+      - 直连
+      - 自动选择
+      - 香港
+      - 台湾
+      - 日本
+      - 新加坡
+      - 美国
+      - 其它地区
+      - provider1
   
-  - <<: *proxyGroup
+  - name: provider1-group
+    type: select
+    use:
+      - provider1
 
   - name: 🎯 全球直连
     type: select
