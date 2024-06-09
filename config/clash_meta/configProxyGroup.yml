@@ -306,7 +306,7 @@ proxy-groups:
       - 新加坡
       - 美国
       - 其它地区
-      - provider1
+      - provider1_select_ahchor
   
   - name: provider1-group
     type: select
