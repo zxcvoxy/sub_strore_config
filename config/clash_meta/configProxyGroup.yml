@@ -1,16 +1,4 @@
 
-# url 里填写自己的订阅,名称不能重复
-proxy-providers:
-  provider1:
-    url: ""
-    type: http
-    interval: 86400
-    health-check:
-        enable: true
-        interval: 3600
-        url: https://www.gstatic.com/generate_204
-    
-
 # port: 7890 # HTTP(S) 代理服务器端口
 # socks-port: 7891 # SOCKS5 代理端口
 mixed-port: 10801 # HTTP(S) 和 SOCKS 代理混合端口
@@ -293,6 +281,18 @@ proxies:
   - name: "直连"
     type: direct
     udp: true
+
+
+# url 里填写自己的订阅,名称不能重复
+proxy-providers:
+  provider1:
+    url: ""
+    type: http
+    interval: 86400
+    health-check:
+        enable: true
+        interval: 3600
+        url: https://www.gstatic.com/generate_204
 
 proxy-groups:
   - name: 🚀 节点选择
