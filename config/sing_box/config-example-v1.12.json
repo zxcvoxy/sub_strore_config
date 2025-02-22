@@ -494,7 +494,7 @@
         "type": "remote",
         "format": "binary",
         "url": "https://testingcf.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@sing/geo/geosite/category-games@cn.srs",
-        "download_detour": "🚀 direct"
+        "download_detour": "direct"
       }
     ]
   },
