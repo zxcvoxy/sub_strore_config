@@ -1,35 +1,33 @@
 {
   "log": {
-    "level": "info",
+    "level": "debug",
     "timestamp": true
-  },
-  "experimental": {
-    "clash_api": {
-      "external_controller": "127.0.0.1:9090",
-      "external_ui": "ui",
-      "secret": "",
-      "external_ui_download_url": "https://github.com/MetaCubeX/metacubexd/archive/refs/heads/gh-pages.zip",
-      "external_ui_download_detour": "🚀 select",
-      "default_mode": "rule"
-    },
-  "cache_file": {
-    "enabled": true,
-    "store_fakeip": true,
-    "store_rdrc": true
-    }
   },
   "dns": {
     "servers": [
       {
-        "tag": "google",
-        "type": "tls",
-        "server": "8.8.8.8"
+        "tag": "dns_proxy",
+        "type": "https",
+        "server": "dns.twnic.tw",
+        "path": "/dns-query",
+        "domain_resolver": "ali_dns"
       },
       {
-        "tag": "local",
+        "tag": "dns_direct",
         "type": "https",
-        "server": "223.5.5.5",
-        "detour": "direct"
+        "server": "doh.pub",
+        "path": "/dns-query",
+        "domain_resolver": "ali_dns"
+      },
+      {
+        "tag": "google_dns",
+        "type": "udp",
+        "server": "1.1.1.1"
+      },
+      {
+        "tag": "ali_dns",
+        "type": "udp",
+        "server": "223.5.5.5"
       },
       {
         "tag": "fakeip",
@@ -41,11 +39,11 @@
     "rules": [
       {
         "clash_mode": "direct",
-        "server": "local"
+        "server": "dns_direct"
       },
       {
         "clash_mode": "global",
-        "server": "google"
+        "server": "dns_proxy"
       },
       {
         "query_type": [
@@ -57,7 +55,7 @@
       },
       {
         "rule_set": "geosite-cn",
-        "server": "local"
+        "server": "dns_direct"
       },
       {
         "type": "logical",
@@ -71,7 +69,7 @@
             "rule_set": "geoip-cn"
           }
         ],
-        "server": "google",
+        "server": "dns_proxy",
         "client_subnet": "114.114.114.114/24"
       },
       {
@@ -82,8 +80,10 @@
         "server": "fakeip"
       }
     ],
-    "independent_cache": true,
-    "strategy": "prefer_ipv4"
+    "final": "dns_proxy",
+    "strategy": "prefer_ipv4",
+    "independent_cache": true
+    
   },
   "inbounds": [
     {
@@ -93,95 +93,96 @@
         "172.19.0.0/30",
         "fdfe:dcba:9876::0/126"
       ],
-      "stack": "system",
+      "stack": "mixed",
       "auto_route": true,
       "strict_route": true,
+      "endpoint_independent_nat": true,
+      "exclude_package": [
+        "com.taobao.idlefish",
+        "com.taobao.taobao",
+        "com.tencent.mm",
+        "com.tencent.mp",
+        "com.tencent.soter.soterserver",
+        "com.tencent.wemeet.app",
+        "com.tencent.weread",
+        "com.tencent.wework"
+      ],
       "platform": {
         "http_proxy": {
           "enabled": true,
           "server": "127.0.0.1",
-          "server_port": 7890
+          "server_port": 7890,
+          "bypass_domain": [],
+          "match_domain": []
         }
       }
     },
     {
-      "tag": "mixed-in",
       "type": "mixed",
+      "tag": "mixed-in",
       "listen": "127.0.0.1",
-      "listen_port": 7890
+      "listen_port": 7890,
+      "users": [],
+      "set_system_proxy": false
     }
   ],
-  "outbounds": [{
-    "tag": "🚀 select",
-    "type": "selector",
-    "default": "urltest",
-    "outbounds": [
-      "urltest"
-    ]
-  },
-  {
-    "tag": "urltest",
-    "type": "urltest",
-    "outbounds": []
-  },
-  {
-    "tag": "direct",
-    "type": "direct"
-  },
-  {
-    "tag": "block",
-    "type": "block"
-  },
-  {
-    "tag": "dns-out",
-    "type": "dns"
-  },
-  {
-    "tag": "🎯 direct",
-    "type": "selector",
-    "default": "direct",
-    "outbounds": [
-      "direct",
-      "🚀 select"
-    ]
-  },
-  {
-    "tag": "🛑 block",
-    "type": "selector",
-    "default": "block",
-    "outbounds": [
-      "block",
-      "direct",
-      "🚀 select"
-    ]
-  },
-  {
-    "tag": "🐟 final",
-    "type": "selector",
-    "default": "🚀 select",
-    "outbounds": [
-      "🚀 select",
-      "direct"
-    ]
-  }
+  "outbounds": [
+    {
+      "tag": "🚀 select",
+      "type": "selector",
+      "default": "urltest",
+      "outbounds": [
+        "urltest"
+      ]
+    },
+    {
+      "tag": "urltest",
+      "type": "urltest",
+      "outbounds": []
+    },
+    {
+      "tag": "direct",
+      "type": "direct"
+    },
+    {
+      "tag": "🎯 direct",
+      "type": "selector",
+      "default": "direct",
+      "outbounds": [
+        "direct",
+        "🚀 select"
+      ]
+    },
+    {
+      "tag": "🐟 final",
+      "type": "selector",
+      "default": "🚀 select",
+      "outbounds": [
+        "🚀 select",
+        "direct"
+      ]
+    }
   ],
   "route": {
     "default_domain_resolver": {
-      "server": "local"
+      "server": "dns_direct"
     },
     "auto_detect_interface": true,
     "final": "🚀 select",
     "rules": [
       {
-        "inbound": ["tun-in", "mixed-in"],
+        "inbound": [
+          "tun-in",
+          "mixed-in"
+        ],
         "action": "sniff"
       },
       {
         "type": "logical",
         "mode": "or",
-        "rules":[
+        "rules": [
           {
-            "port":53
+            "port": 53
           },
           {
             "protocol": "dns"
@@ -221,27 +222,44 @@
         "outbound": "direct"
       },
       {
-        "rule_set": "geosite-openai",
+        "rule_set": [
+          "geosite-bilibili",
+          "geosite-category-games@cn",
+          "geosite-spotify",
+          "geosite-microsoft"
+        ],
+        "outbound": "direct"
+      },
+      {
+        "rule_set": [
+          "geosite-youtube",
+          "geoip-google",
+          "geosite-google",
+          "geosite-github",
+          "geosite-openai",
+          "geoip-telegram",
+          "geosite-telegram",
+          "geoip-twitter",
+          "geosite-twitter",
+          "geoip-facebook",
+          "geosite-facebook",
+          "geoip-netflix",
+          "geosite-netflix",
+          "geoip-apple",
+          "geosite-apple",
+          "geosite-amazon",
+          "geosite-disney",
+          "geosite-hbo",
+          "geosite-primevideo",
+          "geosite-tiktok"
+        ],
         "outbound": "🚀 select"
       },
       {
-        "rule_set": ["geosite-youtube", "geoip-google", "geosite-google", "geosite-github"],
-        "outbound": "🚀 select"
-      },
-      {
-        "rule_set": ["geoip-telegram", "geosite-telegram"],
-        "outbound": "🚀 select"
-      },
-      {
-        "rule_set": ["geoip-twitter", "geosite-twitter"],
-        "outbound": "🚀 select"
-      },
-      {
-        "rule_set":["geoip-facebook", "geosite-facebook"],
-        "outbound": "🚀 select"
-      },
-      {
-        "rule_set": "geosite-bilibili",
+        "rule_set": [
+          "geosite-category-games",
+          "geosite-dmm"
+        ],
         "outbound": "🚀 select"
       },
       {
@@ -249,43 +267,14 @@
         "outbound": "🚀 select"
       },
       {
-        "rule_set": "geosite-spotify",
-        "outbound": "🚀 select"
-      },
-      {
-        "rule_set": "geosite-tiktok",
-        "outbound": "🚀 select"
-      },
-      {
-        "rule_set": ["geoip-netflix", "geosite-netflix"],
-        "outbound": "🚀 select"
-      },
-      {
-        "rule_set": "geosite-disney",
-        "outbound": "🚀 select"
-      },
-      {
-        "rule_set": ["geoip-apple", "geosite-apple", "geosite-amazon"],
-        "outbound": "🚀 select"
-      },
-      {
-        "rule_set": "geosite-microsoft",
-        "outbound": "🚀 select"
-      },
-      {
-        "rule_set": ["geosite-category-games", "geosite-dmm"],
-        "outbound": "🚀 select"
-      },
-      {
-        "rule_set": ["geosite-hbo", "geosite-primevideo"],
-        "outbound": "🚀 select"
-      },
-      {
         "rule_set": "geosite-geolocation-!cn",
         "outbound": "🚀 select"
       },
       {
-        "rule_set": ["geoip-cn", "geosite-cn"],
+        "rule_set": [
+          "geoip-cn",
+          "geosite-cn"
+        ],
         "outbound": "direct"
       }
     ],
@@ -499,7 +488,29 @@
         "format": "binary",
         "url": "https://testingcf.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@sing/geo/geosite/cn.srs",
         "download_detour": "direct"
+      },
+      {
+        "tag": "geosite-category-games@cn",
+        "type": "remote",
+        "format": "binary",
+        "url": "https://testingcf.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@sing/geo/geosite/category-games@cn.srs",
+        "download_detour": "🚀 direct"
       }
     ]
+  },
+  "experimental": {
+    "clash_api": {
+      "external_controller": "127.0.0.1:9090",
+      "external_ui": "ui",
+      "secret": "",
+      "external_ui_download_url": "https://github.com/MetaCubeX/metacubexd/archive/refs/heads/gh-pages.zip",
+      "external_ui_download_detour": "🚀 select",
+      "default_mode": "rule"
+    },
+    "cache_file": {
+      "enabled": true,
+      "store_fakeip": true,
+      "store_rdrc": true
+    }
   }
 }
