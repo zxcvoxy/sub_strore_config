@@ -45,18 +45,6 @@
         "server": "dns_proxy"
       },
       {
-        "query_type": [
-          "A",
-          "AAAA"
-        ],
-        "rule_set": "geosite-cn",
-        "server": "fakeip"
-      },
-      {
-        "rule_set": "geosite-cn",
-        "server": "dns_direct"
-      },
-      {
         "type": "logical",
         "mode": "and",
         "rules": [
@@ -65,18 +53,27 @@
             "invert": true
           },
           {
-            "rule_set": "geoip-cn"
+            "rule_set": [
+              "geoip-cn",
+              "geosite-cn"
+            ]
           }
         ],
         "server": "dns_proxy",
         "client_subnet": "114.114.114.114/24"
       },
       {
+        "rule_set": "geosite-geolocation-!cn",
+        "server": "dns_proxy"
+      },
+      {
         "query_type": [
           "A",
           "AAAA"
         ],
-        "server": "fakeip"
+        "rule_set": "geosite-cn",
+        "server": "fakeip",
+        "rewrite_ttl": 1
       }
     ],
     "final": "dns_proxy",
@@ -163,9 +160,9 @@
   ],
   "route": {
     "default_domain_resolver": {
-			"server": "ali_dns",
-			"rewrite_tll": 60
-		},
+      "server": "ali_dns",
+      "rewrite_tll": 60
+    },
     "auto_detect_interface": true,
     "final": "🚀 select",
     "rules": [
@@ -189,9 +186,9 @@
         ],
         "action": "hijack-dns"
       },
-      { 
-        "action": "resolve", 
-        "server": "dns_direct" 
+      {
+        "action": "resolve",
+        "server": "dns_direct"
       },
       {
         "rule_set": "geosite-category-ads-all",
@@ -221,6 +218,10 @@
       },
       {
         "rule_set": "geosite-cn",
+        "outbound": "direct"
+      },
+      {
+        "rule_set": "geosite-category-companies@cn",
         "outbound": "direct"
       },
       {
@@ -302,6 +303,13 @@
         "type": "remote",
         "format": "binary",
         "url": "https://testingcf.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@sing/geo/geosite/cn.srs",
+        "download_detour": "direct"
+      },
+      {
+        "tag": "geosite-category-companies@cn",
+        "type": "remote",
+        "format": "binary",
+        "url": "https://testingcf.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@sing/geo/geosite/category-communication.srs",
         "download_detour": "direct"
       },
       {
