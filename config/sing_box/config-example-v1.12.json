@@ -45,6 +45,15 @@
         "server": "dns_proxy"
       },
       {
+        "query_type": [
+          "A",
+          "AAAA"
+        ],
+        "rule_set": "geosite-cn",
+        "server": "fakeip",
+        "rewrite_ttl": 1
+      },
+      {
         "type": "logical",
         "mode": "and",
         "rules": [
@@ -65,15 +74,6 @@
       {
         "rule_set": "geosite-geolocation-!cn",
         "server": "dns_proxy"
-      },
-      {
-        "query_type": [
-          "A",
-          "AAAA"
-        ],
-        "rule_set": "geosite-cn",
-        "server": "fakeip",
-        "rewrite_ttl": 1
       }
     ],
     "final": "dns_proxy",
