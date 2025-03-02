@@ -20,6 +20,10 @@
         "path": "/dns-query"
       },
       {
+        "tag": "local",
+        "type": "dhcp"
+      },
+      {
         "tag": "cloudflare_https_dns",
         "type": "https",
         "server": "1.1.1.1",
