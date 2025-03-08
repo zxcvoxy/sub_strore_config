@@ -13,11 +13,6 @@ p:
       },
   }
 
-all: &all
-  type: select
-  use:
-    - provider1
-
 rule-anchor:
   ip: &ip { type: http, interval: 86400, behavior: ipcidr, format: yaml }
   domain:
@@ -32,6 +27,11 @@ proxy-providers:
   provider1:
     <<: *p
     url: ""
+
+all: &all
+  type: select
+  use:
+    - provider1
 
 
 mode: rule
