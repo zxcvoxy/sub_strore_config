@@ -27,12 +27,7 @@ proxy-providers:
   provider1:
     <<: *p
     url: ""
-
-all: &all
-  type: select
-  use:
-    - provider1
-
+    
 
 mode: rule
 log-level: debug # 日志等级 silent/error/warning/info/debug
