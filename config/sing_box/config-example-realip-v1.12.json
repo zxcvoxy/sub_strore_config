@@ -78,7 +78,7 @@
     "strategy": "ipv4_only",
     "disable_cache": false,
     "disable_expire": false,
-    "independent_cache": true,
+    "independent_cache": false,
     "reverse_mapping": true
   },
   "inbounds": [
