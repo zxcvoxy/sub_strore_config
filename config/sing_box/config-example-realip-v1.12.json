@@ -204,6 +204,12 @@
         "outbound": "direct"
       },
       {
+        "domain_keyword": [
+          "registry.npmmirror.com"
+        ],
+        "outbound": "🚀 select"
+      },
+      {
         "rule_set": "geosite-category-ads-all",
         "clash_mode": "rule",
         "action": "reject"
