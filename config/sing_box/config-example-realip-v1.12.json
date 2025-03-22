@@ -20,29 +20,10 @@
         "path": "/dns-query"
       },
       {
-        "tag": "local",
-        "type": "dhcp"
-      },
-      {
         "tag": "cloudflare_https_dns",
         "type": "https",
         "server": "1.1.1.1",
         "path": "/dns-query"
-      },
-      {
-        "tag": "cloudflare_dns",
-        "type": "udp",
-        "server": "1.1.1.1"
-      },
-      {
-        "tag": "ali_dns",
-        "type": "udp",
-        "server": "223.5.5.5"
-      },
-      {
-        "tag": "tx_dns",
-        "type": "https",
-        "server": "120.53.53.53"
       }
     ],
     "rules": [
@@ -89,7 +70,7 @@
         "172.19.0.0/30",
         "fdfe:dcba:9876::0/126"
       ],
-      "stack": "gvisor",
+      "stack": "mixed",
       "auto_route": true,
       "strict_route": true,
       "endpoint_independent_nat": true,
@@ -229,10 +210,8 @@
       {
         "action": "resolve",
         "server": "dns_proxy",
-        "strategy": "ipv4_only",
         "disable_cache": false,
         "rewrite_ttl": 1
-        
       },
       {
         "rule_set": "geoip-cn",
