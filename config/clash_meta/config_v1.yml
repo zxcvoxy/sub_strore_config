@@ -264,31 +264,55 @@ proxy-groups:
     type: url-test
     include-all-providers: true
     filter: "(?i)港|hk|hongkong|hong kong"
+    tolerance: 150
+    lazy: true
+    url: 'http://www.gstatic.com/generate_204'
+    interval: 120
 
   - name: 台湾
     type: url-test
     include-all-providers: true
     filter: "(?i)台|tw|taiwan"
+    tolerance: 150
+    lazy: true
+    url: 'http://www.gstatic.com/generate_204'
+    interval: 120
 
   - name: 日本
     type: url-test
     include-all-providers: true
     filter: "(?i)日|jp|japan"
+    tolerance: 150
+    lazy: true
+    url: 'http://www.gstatic.com/generate_204'
+    interval: 120
 
   - name: 美国
     type: url-test
     include-all-providers: true
     filter: "(?i)美|us|unitedstates|united states"
+    tolerance: 150
+    lazy: true
+    url: 'http://www.gstatic.com/generate_204'
+    interval: 120
 
   - name: 新加坡
     type: url-test
     include-all-providers: true
     filter: "(?i)(新|sg|singapore)"
+    tolerance: 150
+    lazy: true
+    url: 'http://www.gstatic.com/generate_204'
+    interval: 120
 
   - name: 其它地区
     type: url-test
     include-all-providers: true
     filter: "(?i)^(?!.*(?:🇭🇰|🇯🇵|🇺🇸|🇸🇬|🇨🇳|港|hk|hongkong|台|tw|taiwan|日|jp|japan|新|sg|singapore|美|us|unitedstates)).*"
+    tolerance: 150
+    lazy: true
+    url: 'http://www.gstatic.com/generate_204'
+    interval: 120
 
 # 规则
 rules:
