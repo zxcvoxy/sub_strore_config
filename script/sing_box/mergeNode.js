@@ -86,7 +86,10 @@ function mergeSub_singbox(profiles,configExample) {
             const us_group = {
                 "tag": "us_list",
                 "type": "urltest",
-                "outbounds": us_tag_list
+                "outbounds": us_tag_list,
+                "url": "https://www.gstatic.com/generate_204",
+                "interval": "2m",
+                "tolerance": 150
             };
             new_group_list.push(us_group);
             select_tag_list.push("us_list");
@@ -96,7 +99,10 @@ function mergeSub_singbox(profiles,configExample) {
             const hk_group = {
                 "tag": "hk_list",
                 "type": "urltest",
-                "outbounds": hk_tag_list
+                "outbounds": hk_tag_list,
+                "url": "https://www.gstatic.com/generate_204",
+                "interval": "2m",
+                "tolerance": 150
             };
             new_group_list.push(hk_group);
             select_tag_list.push("hk_list");
@@ -106,7 +112,10 @@ function mergeSub_singbox(profiles,configExample) {
             const sg_group = {
                 "tag": "sg_list",
                 "type": "urltest",
-                "outbounds": sg_tag_list
+                "outbounds": sg_tag_list,
+                "url": "https://www.gstatic.com/generate_204",
+                "interval": "2m",
+                "tolerance": 150
             };
             new_group_list.push(sg_group);
             select_tag_list.push("sg_list");
@@ -116,7 +125,10 @@ function mergeSub_singbox(profiles,configExample) {
             const jp_group = {
                 "tag": "jp_list",
                 "type": "urltest",
-                "outbounds": jp_tag_list
+                "outbounds": jp_tag_list,
+                "url": "https://www.gstatic.com/generate_204",
+                "interval": "2m",
+                "tolerance": 150
             };
             new_group_list.push(jp_group);
             select_tag_list.push("jp_list");
