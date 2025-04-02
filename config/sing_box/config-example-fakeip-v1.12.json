@@ -7,7 +7,7 @@
     "servers": [
       {
         "tag": "dns_proxy",
-        "type": "h3",
+        "type": "https",
         "server": "dns.nextdns.io",
         "path": "/dns-query",
         "domain_resolver": "dns_direct",
@@ -15,7 +15,7 @@
       },
       {
         "tag": "dns_direct",
-        "type": "https",
+        "type": "c",
         "server": "120.53.53.53",
         "path": "/dns-query"
       },
