@@ -15,7 +15,7 @@
       },
       {
         "tag": "dns_direct",
-        "type": "c",
+        "type": "https",
         "server": "120.53.53.53",
         "path": "/dns-query"
       },
