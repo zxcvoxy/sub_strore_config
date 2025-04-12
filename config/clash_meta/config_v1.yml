@@ -316,12 +316,16 @@ proxy-groups:
 
 # 规则
 rules:
+  - DOMAIN-SUFFIX,googleapis.cn,🚀 节点选择
+  - DOMAIN-SUFFIX,xn--ngstr-lra8j.com,🎯 全球直连 # Google Play 国外/国内 服务器
+  - DOMAIN-SUFFIX,xn--ngstr-cn-8za9o.com,🎯 全球直连 # Google Play 纯国内 服务器
+
   # 域名规则
   - RULE-SET,cn,🎯 全球直连
   - RULE-SET,category-games@cn,🎯 全球直连
   - RULE-SET,proxy,🚀 节点选择
 
-# 默认规则
+  # 默认规则
   - RULE-SET,collection,🎯 全球直连
   - RULE-SET,cn-ip,🎯 全球直连
   - GEOIP,CN,🎯 全球直连
