@@ -132,12 +132,22 @@ sniffer:
 # DNS 配置
 dns:
   enable: true
-  ipv6: true
+  cache-algorithm: arc
+  prefer-h3: true
+  use-hosts: true
+  use-system-hosts: false # 是否使用系统hosts，需要就开启下
   listen: 0.0.0.0:1053
+  ipv6: false
+  respect-rules: false
   enhanced-mode: redir-host
+  fake-ip-range: 10.0.0.1/16  # tun和fake模式下的ip段，tun的网卡使用此ip段，确保无冲突
+  default-nameserver:
+    - quic://223.5.5.5
+    - tls://1.12.12.12
   nameserver:
-    - tls://1.0.0.1
-    - tls://8.8.4.4
+    - quic://fly.dns.vlo.cc
+  proxy-server-nameserver:
+    - https://v4.vlo.cc/520/psn
 
 proxies:
   - name: "直连"
