@@ -131,23 +131,63 @@ sniffer:
 
 # DNS 配置
 dns:
-  enable: true
-  cache-algorithm: arc
-  prefer-h3: true
-  use-hosts: true
-  use-system-hosts: false # 是否使用系统hosts，需要就开启下
-  listen: 0.0.0.0:1053
-  ipv6: false
-  respect-rules: false
+  enable: true  # 关闭将使用系统 DNS
+  # 开启 DOH 的 http/3
+  # prefer-h3: true
+  listen: 0.0.0.0:53
+  ipv6: true
+  ipv6-timeout: 300 
+  # dns 连接遵守路由规则，需配置 proxy-server-nameserver ，不建议和 prefer-h3 一起使用
+  respect-rules: true 
   enhanced-mode: redir-host
-  fake-ip-range: 10.0.0.1/16  # tun和fake模式下的ip段，tun的网卡使用此ip段，确保无冲突
+  # 用于解析 nameserver，fallback 以及其他 DNS 服务器配置的，DNS 服务域名
+  # 只能使用纯 IP 地址，可使用加密 DNS
   default-nameserver:
-    - quic://223.5.5.5
-    - tls://1.12.12.12
+    - 114.114.114.114 #114dns
+    - 119.29.29.29 #腾讯云
+    - 223.5.5.5 # 阿里云
+    - system # append DNS server from system configuration. If not found, it would print an error log and skip.
+  # DNS 主要域名配置
+  # 支持 UDP，TCP，DoT，DoH，DoQ
+  # 这部分为主要 DNS 配置，影响所有直连，确保使用对大陆解析精准的 DNS
+  # 默认的域名解析服务器，如不配置 fallback/proxy-server-nameserver , 则所有域名都由 nameserver 解析
   nameserver:
-    - quic://fly.dns.vlo.cc
+    - "udp://223.6.6.6"
+    - "udp://223.5.5.5"
+  # 代理节点域名解析服务器，仅用于解析代理节点的域名 ,非必要配置项
   proxy-server-nameserver:
-    - https://v4.vlo.cc/520/psn
+    - "https://doh.pub/dns-query"
+  # 后备域名解析服务器，一般情况下使用境外 DNS, 保证结果可信
+  fallback:
+    - "udp://1.1.1.1"
+    - "udp://8.8.8.8"
+    - "udp://8.8.4.4"
+  # 指定域名查询的解析服务器，可使用 geosite, 优先于 nameserver/fallback 查询
+  # 并发查询，无法保证顺序
+  nameserver-policy:
+    "geosite:cn":
+      - https://doh.pub/dns-query
+      - https://dns.alidns.com/dns-query
+    "geosite:gfw":
+      - "tls://8.8.4.4"
+      - "udp://8.8.4.4"
+    "rule-set:cn":
+      - "https://doh.pub/dns-query"
+      - "https://dns.alidns.com/dns-query"
+    "rule-set:proxy":
+      - "https://dns.cloudflare.com/dns-query#dns"
+      - "https://dns.google/dns-query#dns"
+  # 后备域名解析服务器筛选，满足条件的将使用 fallback结果或只使用 fallback解析
+  fallback-filter:
+    geoip: true
+    # 当 nameserver 域名的 IP 查询 geoip 库为 CN 时，不使用 fallback 中的 DNS 查询结果
+    geoip-code: CN
+    ipcidr:
+      - 240.0.0.0/4
+    domain:
+      - "+.google.com"
+      - "+.facebook.com"
+      - "+.youtube.com"
 
 proxies:
   - name: "直连"

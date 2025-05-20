@@ -131,8 +131,8 @@ sniffer:
 
 # DNS 配置
 dns:
-  enable: true # 关闭将使用系统 DNS
-  # 开启 DoH 支持 HTTP/3，将并发尝试
+  enable: true  # 关闭将使用系统 DNS
+  # 开启 DOH 的 http/3
   prefer-h3: true
   listen: 0.0.0.0:53 # 开启 DNS 服务器监听
   # false 将返回 AAAA 的空结果
