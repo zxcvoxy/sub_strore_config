@@ -139,7 +139,7 @@ dns:
   ipv6-timeout: 300 
   # dns 连接遵守路由规则，需配置 proxy-server-nameserver ，不建议和 prefer-h3 一起使用
   # respect-rules: true 
-  enhanced-mode: redir-host
+  # enhanced-mode: redir-host
   # 用于解析 nameserver，fallback 以及其他 DNS 服务器配置的，DNS 服务域名
   # 只能使用纯 IP 地址，可使用加密 DNS
   # default-nameserver:
@@ -167,6 +167,12 @@ dns:
   #   - "udp://1.1.1.1"
   #   - "udp://8.8.8.8"
   #   - "udp://8.8.4.4"
+  enhanced-mode: fake-ip
+  fake-ip-range: 28.0.0.1/8
+  fake-ip-filter:
+    - "*"
+    - "+.lan"
+    - "+.local"
   nameserver:
     - https://101.101.101.101/dns-query
     - https://1.1.1.1/dns-query
