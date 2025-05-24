@@ -257,11 +257,12 @@ rules:
   - GEOSITE,geolocation-!cn,🚀 节点选择
   - GEOSITE,geolocation-cn@!cn,🚀 节点选择
   - GEOSITE,geolocation-cn,🎯 全球直连
-
   - GEOSITE,CN,🎯 全球直连
-  - GEOIP,CN,🎯 全球直连
-  - RULE-SET,cn-ip,🎯 全球直连
-  - GEOIP,CN,🎯 全球直连
+  
+  - GEOIP,telegram,PROXY,no-resolve
+  - GEOIP,lan,DIRECT
+  - GEOIP,cn,DIRECT
+  - RULE-SET,cn-ip,DIRECT
   - MATCH,🐟 漏网之鱼
 
 rule-providers:
