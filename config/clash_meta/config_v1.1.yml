@@ -133,7 +133,7 @@ dns:
     - 'https://8.8.8.8/dns-query#ecs=120.76.0.0/14&ecs-override=true'
     - 'https://1.1.1.1/dns-query#ecs=120.76.0.0/14&ecs-override=true'
   nameserver-policy:
-    'geosite:category-games,category-game-platforms-download,category-game-accelerator-cn':
+    "geosite:cn,private,category-game-accelerator-cn,category-games,apple,apple-cn":
       - 223.5.5.5
       - tls://223.5.5.5:853
       - tls://119.29.29.29:853
