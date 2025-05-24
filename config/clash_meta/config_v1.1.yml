@@ -109,13 +109,8 @@ dns:
   listen: 0.0.0.0:53
   ipv6: true
   ipv6-timeout: 300 
+  enhanced-mode: redir-host
   respect-rules: true # dns 连接遵守路由规则, 不建议和 prefer-h3 一起使用
-  enhanced-mode: fake-ip
-  fake-ip-range: 198.18.0.1/16
-  fake-ip-filter-mode: blacklist
-  fake-ip-filter:
-    - "geosite:connectivity-check"
-    - "geosite:private"
   default-nameserver: #用于解析 DNS 服务器 的域名
     - 223.5.5.5
     - 119.29.29.29
@@ -266,7 +261,10 @@ rules:
   - RULE-SET,category-games@cn,🎯 全球直连
   - RULE-SET,collection,🎯 全球直连
   - RULE-SET,proxy,🚀 节点选择
+  - GEOSITE,geolocation-!cn@cn,🎯 全球直连
   - GEOSITE,geolocation-!cn,🚀 节点选择
+  - GEOSITE,geolocation-cn@!cn,🚀 节点选择
+  - GEOSITE,geolocation-cn,🎯 全球直连
 
   - GEOSITE,CN,🎯 全球直连
   - GEOIP,CN,🎯 全球直连
