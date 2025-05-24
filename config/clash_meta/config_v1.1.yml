@@ -259,10 +259,12 @@ rules:
   # 域名规则
   - RULE-SET,cn,🎯 全球直连
   - RULE-SET,category-games@cn,🎯 全球直连
-  - RULE-SET,proxy,🚀 节点选择
-
-  # 默认规则
   - RULE-SET,collection,🎯 全球直连
+  - RULE-SET,proxy,🚀 节点选择
+  - GEOSITE,geolocation-!cn,🚀 节点选择
+
+  - GEOSITE,CN,🎯 全球直连
+  - GEOIP,CN,🎯 全球直连
   - RULE-SET,cn-ip,🎯 全球直连
   - GEOIP,CN,🎯 全球直连
   - MATCH,🐟 漏网之鱼
