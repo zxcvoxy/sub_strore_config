@@ -110,6 +110,7 @@ dns:
   ipv6: true
   ipv6-timeout: 300 
   enhanced-mode: redir-host
+  respect-rules: true
   default-nameserver: #用于解析 DNS 服务器 的域名
     - 223.5.5.5
     - 119.29.29.29
