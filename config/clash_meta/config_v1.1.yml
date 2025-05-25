@@ -130,6 +130,8 @@ dns:
   nameserver:
     - 'https://8.8.8.8/dns-query#ecs=120.76.0.0/14&ecs-override=true'
     - 'https://1.1.1.1/dns-query#ecs=120.76.0.0/14&ecs-override=true'
+    - udp://1.1.1.1
+    - udp://8.8.8.8
   nameserver-policy:
     "geosite:cn,private,category-game-accelerator-cn,category-games,apple,apple-cn":
       - 223.5.5.5
