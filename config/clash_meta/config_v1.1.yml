@@ -113,7 +113,7 @@ dns:
   ipv6: true
   ipv6-timeout: 300 
   respect-rules: true # dns 连接遵守路由规则, 不建议和 prefer-h3 一起使用
-  enhanced-mode: fake-ip
+  enhanced-mode: redir-host # fake-ip
   fake-ip-range: 198.18.0.1/16
   fake-ip-filter:
     - 'geosite:connectivity-check'
