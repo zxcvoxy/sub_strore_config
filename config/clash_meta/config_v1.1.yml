@@ -258,8 +258,8 @@ rules:
   - GEOSITE,geolocation-cn@!cn,🚀 节点选择
   - GEOSITE,geolocation-cn,🎯 全球直连
   - GEOSITE,CN,🎯 全球直连
-  
-  - GEOIP,telegram,PROXY,no-resolve
+
+  - GEOIP,telegram,🚀 节点选择,no-resolve
   - GEOIP,lan,DIRECT
   - GEOIP,cn,DIRECT
   - RULE-SET,cn-ip,DIRECT
