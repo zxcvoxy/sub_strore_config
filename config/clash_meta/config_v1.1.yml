@@ -64,10 +64,6 @@ ntp:
 geodata-mode: true # GEOIP 数据模式
 geo-auto-update: true # 是否自动更新 geodata
 geo-update-interval: 24 # 更新间隔，单位：小时
-# geox-url:
-#   geoip: "https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@release/geoip.dat"
-#   geosite: "https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@release/geosite.dat"
-#   mmdb: "https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@release/geoip.metadb"
 geox-url:
   geosite: https://ghfast.top/https://github.com/MetaCubeX/meta-rules-dat/releases/download/latest/geosite.dat
   mmdb: https://ghfast.top/https://github.com/MetaCubeX/meta-rules-dat/releases/download/latest/geoip.metadb
@@ -83,8 +79,10 @@ sniffer:
   sniff: # TLS 和 QUIC 默认如果不配置 ports 默认嗅探 443
     QUIC:
       ports: [443]
+      override-destination: true
     TLS:
       ports: [443, 8443]
+      override-destination: true
     HTTP: 
       ports: [80, 8080-8880]
       override-destination: true
@@ -139,16 +137,11 @@ dns:
       - tls://119.29.29.29:853
       - tls://dot.360.cn:853
 
-proxies:
-  - name: "直连"
-    type: direct
-    udp: true
-
 proxy-groups:
-  - name: 🚀 节点选择
+  - name: PROXY
     type: select
     proxies:
-      - 直连
+      - DIRECT
       - 自动选择
       - 香港
       - 台湾
@@ -163,22 +156,10 @@ proxy-groups:
     use:
       - provider1
 
-  - name: 🎯 全球直连
-    type: select
-    proxies:
-      - DIRECT
-      - 🚀 节点选择
-
-  - name: 🛑 全球拦截
-    type: select
-    proxies:
-      - REJECT
-      - DIRECT
-
   - name: 🐟 漏网之鱼
     type: select
     proxies:
-      - 🚀 节点选择
+      - PROXY
       - DIRECT
 
   #分隔,下面是地区分组
@@ -243,23 +224,24 @@ proxy-groups:
 
 # 规则
 rules:
-  - DOMAIN-SUFFIX,googleapis.com,🚀 节点选择
-  - DOMAIN-SUFFIX,googleapis.cn,🚀 节点选择
-  - DOMAIN-SUFFIX,xn--ngstr-lra8j.com,🚀 节点选择 # Google Play 国外/国内 服务器
-  - DOMAIN-SUFFIX,xn--ngstr-cn-8za9o.com,🚀 节点选择 # Google Play 纯国内 服务器
+  - DOMAIN-SUFFIX,googleapis.com,PROXY
+  - DOMAIN-SUFFIX,googleapis.cn,PROXY
+  - DOMAIN-SUFFIX,xn--ngstr-lra8j.com,PROXY # Google Play 国外/国内 服务器
+  - DOMAIN-SUFFIX,xn--ngstr-cn-8za9o.com,PROXY # Google Play 纯国内 服务器
 
   # 域名规则
-  - RULE-SET,cn,🎯 全球直连
-  - RULE-SET,category-games@cn,🎯 全球直连
-  - RULE-SET,collection,🎯 全球直连
-  - RULE-SET,proxy,🚀 节点选择
-  - GEOSITE,geolocation-!cn@cn,🎯 全球直连
-  - GEOSITE,geolocation-!cn,🚀 节点选择
-  - GEOSITE,geolocation-cn@!cn,🚀 节点选择
-  - GEOSITE,geolocation-cn,🎯 全球直连
-  - GEOSITE,CN,🎯 全球直连
+  - RULE-SET,cn,DIRECT
+  - RULE-SET,category-games@cn,DIRECT
+  - RULE-SET,collection,DIRECT
+  - RULE-SET,proxy,PROXY
+  - GEOSITE,CN,DIRECT
+  - GEOSITE,github,PROXY
+  - GEOSITE,geolocation-!cn@cn,DIRECT
+  - GEOSITE,geolocation-!cn,PROXY
+  - GEOSITE,geolocation-cn@!cn,PROXY
+  - GEOSITE,geolocation-cn,DIRECT
 
-  - GEOIP,telegram,🚀 节点选择,no-resolve
+  - GEOIP,telegram,PROXY,no-resolve
   - GEOIP,lan,DIRECT
   - GEOIP,cn,DIRECT
   - RULE-SET,cn-ip,DIRECT
