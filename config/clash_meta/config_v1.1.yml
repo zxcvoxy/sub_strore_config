@@ -75,6 +75,7 @@ geodata-mode: true # GEOIP 数据模式
 geo-auto-update: true # 是否自动更新 geodata
 geo-update-interval: 24 # 更新间隔，单位：小时
 geox-url:
+  # geosite: https://github.com/MetaCubeX/meta-rules-dat/releases/download/latest/geosite.dat
   geosite: https://ghfast.top/https://github.com/v2fly/domain-list-community/releases/latest/download/dlc.dat
   mmdb: https://ghfast.top/https://github.com/MetaCubeX/meta-rules-dat/releases/download/latest/geoip.metadb
   geoip: https://cdn.jsdelivr.net/gh/Loyalsoldier/geoip@release/geoip.dat
@@ -148,7 +149,7 @@ dns:
     - 'tls://[2001:4860:4860::8844]'
     - 'tls://[2606:4700:4700::1001]'
   nameserver-policy:
-    "geosite:cn,private,category-game-accelerator-cn,category-games,apple,apple-cn":
+    "geosite:cn,private,category-game-accelerator-cn,category-games":
       - 'tls://223.5.5.5:853'
       - 'tls://119.29.29.29:853'
       - 'tls://dot.360.cn:853'
