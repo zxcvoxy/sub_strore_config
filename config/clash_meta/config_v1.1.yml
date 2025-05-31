@@ -13,11 +13,21 @@ p: &p
     tolerance: 100
 
 rule-anchor:
-  ip: &ip { type: http, interval: 86400, behavior: ipcidr, format: yaml }
-  domain:
-    &domain { type: http, interval: 86400, behavior: domain, format: yaml }
-  classical:
-    &classical { type: http, interval: 86400, behavior: classical, format: yaml }
+  ip: &ip
+    type: http
+    behavior: ipcidr
+    format: yaml
+    interval: 86400
+  domain: &domain
+    type: http
+    behavior: domain
+    format: yaml
+    interval: 86400
+  classical: &classical
+    type: http
+    behavior: classical
+    format: yaml
+    interval: 86400
 
 ######### 锚点 end #######
 
@@ -57,9 +67,9 @@ ntp:
   interval: 30
 
 # 外部控制端口
-# external-controller: 0.0.0.0:9090 # RESTful API 监听地址
-# secret: ""
-# external-ui-url: "https://github.com/Zephyruso/zashboard/archive/refs/heads/gh-pages.zip"
+external-controller: 0.0.0.0:9090
+secret: "123123"
+external-ui-url: "https://github.com/Zephyruso/zashboard/archive/refs/heads/gh-pages.zip"
 
 geodata-mode: true # GEOIP 数据模式
 geo-auto-update: true # 是否自动更新 geodata
@@ -239,12 +249,13 @@ rules:
   - DOMAIN-SUFFIX,xn--ngstr-cn-8za9o.com,PROXY # Google Play 纯国内 服务器
 
   # 域名规则
-  - RULE-SET,cn,DIRECT
+  - GEOSITE,private,DIRECT
+
   - RULE-SET,category-games@cn,DIRECT
   - RULE-SET,collection,DIRECT
-  - RULE-SET,proxy,PROXY
-  - GEOSITE,CN,DIRECT
+
   - GEOSITE,github,PROXY
+  - GEOSITE,category-pt,DIRECT
   - GEOSITE,geolocation-!cn@cn,DIRECT
   - GEOSITE,geolocation-!cn,PROXY
   - GEOSITE,geolocation-cn@!cn,PROXY
@@ -259,12 +270,6 @@ rule-providers:
   collection:
     <<: *classical
     url: "https://gist.githubusercontent.com/cnfree8964/0864fd1d2e88936a095fb40d74ce4993/raw/collection.yaml"
-  cn:
-    <<: *classical
-    url: "https://github.com/MetaCubeX/meta-rules-dat/raw/refs/heads/meta/geo/geosite/classical/cn.yaml"
   category-games@cn:
     <<: *classical
     url: "https://github.com/MetaCubeX/meta-rules-dat/raw/refs/heads/meta/geo/geosite/classical/category-games@cn.yaml"
-  proxy:
-    <<: *classical
-    url: "https://github.com/MetaCubeX/meta-rules-dat/raw/refs/heads/meta/geo-lite/geosite/classical/proxy.yaml"
