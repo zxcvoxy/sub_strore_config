@@ -1,0 +1,281 @@
+{
+  "log": {
+    "level": "debug",
+    "timestamp": true
+  },
+  "dns": {
+    "servers": [
+      {
+        "tag": "dns_proxy",
+        "type": "h3",
+        "server": "dns.nextdns.io",
+        "path": "/dns-query",
+        "domain_resolver": "dns_direct",
+        "detour": "🚀 select"
+      },
+      {
+        "tag": "dns_direct",
+        "type": "https",
+        "server": "120.53.53.53",
+        "path": "/dns-query"
+      },
+      {
+        "tag": "cloudflare_https_dns",
+        "type": "https",
+        "server": "1.1.1.1",
+        "path": "/dns-query"
+      }
+    ],
+    "rules": [
+      {
+        "clash_mode": "direct",
+        "server": "dns_direct"
+      },
+      {
+        "clash_mode": "global",
+        "server": "dns_proxy"
+      },
+      {
+        "type": "logical",
+        "mode": "and",
+        "rules": [
+          {
+            "rule_set": "geosite-geolocation-!cn",
+            "invert": true
+          },
+          {
+            "rule_set": "geoip-cn"
+          }
+        ],
+        "server": "dns_proxy",
+        "client_subnet": "114.114.114.114/24"
+      },
+      {
+        "rule_set": "geosite-cn",
+        "server": "dns_direct"
+      }
+    ],
+    "final": "dns_proxy",
+    "strategy": "ipv4_only",
+    "disable_cache": false,
+    "disable_expire": false,
+    "independent_cache": false,
+    "reverse_mapping": true
+  },
+  "inbounds": [
+    {
+      "tag": "tun-in",
+      "type": "tun",
+      "address": [
+        "172.19.0.0/30",
+        "fdfe:dcba:9876::0/126"
+      ],
+      "stack": "mixed",
+      "auto_route": true,
+      "strict_route": true,
+      "endpoint_independent_nat": true,
+      "exclude_package": [
+        "com.taobao.idlefish",
+        "com.taobao.taobao",
+        "com.tencent.mm",
+        "com.tencent.mp",
+        "com.tencent.soter.soterserver",
+        "com.tencent.wemeet.app",
+        "com.tencent.weread",
+        "com.tencent.wework"
+      ],
+      "platform": {
+        "http_proxy": {
+          "enabled": false,
+          "server": "127.0.0.1",
+          "server_port": 7890,
+          "bypass_domain": [],
+          "match_domain": []
+        }
+      }
+    },
+    {
+      "type": "mixed",
+      "tag": "mixed-in",
+      "listen": "127.0.0.1",
+      "listen_port": 7890,
+      "users": [],
+      "set_system_proxy": false
+    }
+  ],
+  "outbounds": [
+    {
+      "tag": "🚀 select",
+      "type": "selector",
+      "default": "urltest",
+      "outbounds": [
+        "urltest"
+      ]
+    },
+    {
+      "tag": "urltest",
+      "type": "urltest",
+      "outbounds": []
+    },
+    {
+      "tag": "direct",
+      "type": "direct"
+    },
+    {
+      "tag": "🎯 direct",
+      "type": "selector",
+      "default": "direct",
+      "outbounds": [
+        "direct",
+        "🚀 select"
+      ]
+    },
+    {
+      "tag": "🐟 final",
+      "type": "selector",
+      "default": "🚀 select",
+      "outbounds": [
+        "🚀 select",
+        "direct"
+      ]
+    }
+  ],
+  "route": {
+    "default_domain_resolver": {
+      "server": "dns_direct",
+      "rewrite_tll": 60
+    },
+    "auto_detect_interface": true,
+    "final": "🚀 select",
+    "rules": [
+      {
+        "action": "sniff"
+      },
+      {
+        "protocol": [
+          "bittorrent",
+          "quic"
+        ],
+        "action": "reject",
+        "method": "default"
+      },
+      {
+        "type": "logical",
+        "mode": "or",
+        "rules": [
+          {
+            "port": 53
+          },
+          {
+            "protocol": "dns"
+          }
+        ],
+        "action": "hijack-dns"
+      },
+      {
+        "clash_mode": "direct",
+        "outbound": "direct"
+      },
+      {
+        "clash_mode": "global",
+        "outbound": "🚀 select"
+      },
+      {
+        "ip_is_private": true,
+        "outbound": "direct"
+      },
+      {
+        "domain_keyword": [
+          "npmmirror.com"
+        ],
+        "outbound": "🚀 select"
+      },
+      {
+        "rule_set": "geosite-category-ads-all",
+        "clash_mode": "rule",
+        "action": "reject"
+      },
+      {
+        "rule_set": "geosite-category-games@cn",
+        "outbound": "direct"
+      },
+      {
+        "rule_set": "geosite-cn",
+        "outbound": "direct"
+      },
+      {
+        "rule_set": "geosite-proxy",
+        "outbound": "🚀 select"
+      },
+      {
+        "action": "resolve",
+        "server": "dns_proxy",
+        "disable_cache": false,
+        "rewrite_ttl": 1
+      },
+      {
+        "rule_set": "geoip-cn",
+        "outbound": "direct"
+      }
+    ],
+    "rule_set": [
+      {
+        "tag": "geosite-category-ads-all",
+        "type": "remote",
+        "format": "binary",
+        "url": "https://github.com/MetaCubeX/meta-rules-dat/raw/refs/heads/sing/geo/geosite/category-ads-all.srs",
+        "download_detour": "🚀 select"
+      },
+      {
+        "tag": "geosite-category-games@cn",
+        "type": "remote",
+        "format": "binary",
+        "url": "https://github.com/MetaCubeX/meta-rules-dat/raw/refs/heads/sing/geo/geosite/category-games@cn.srs",
+        "download_detour": "🚀 select"
+      },
+      {
+        "tag": "geoip-cn",
+        "type": "remote",
+        "format": "binary",
+        "url": "https://github.com/MetaCubeX/meta-rules-dat/raw/refs/heads/sing/geo/geoip/cn.srs",
+        "download_detour": "🚀 select"
+      },
+      {
+        "tag": "geosite-geolocation-!cn",
+        "type": "remote",
+        "format": "binary",
+        "url": "https://github.com/MetaCubeX/meta-rules-dat/raw/refs/heads/sing/geo/geosite/geolocation-!cn.srs",
+        "download_detour": "🚀 select"
+      },
+      {
+        "tag": "geosite-cn",
+        "type": "remote",
+        "format": "binary",
+        "url": "https://github.com/MetaCubeX/meta-rules-dat/raw/refs/heads/sing/geo/geosite/cn.srs",
+        "download_detour": "🚀 select"
+      },
+      {
+        "tag": "geosite-proxy",
+        "type": "remote",
+        "format": "binary",
+        "url": "https://github.com/MetaCubeX/meta-rules-dat/raw/refs/heads/sing/geo-lite/geosite/proxy.srs",
+        "download_detour": "🚀 select"
+      }
+    ]
+  },
+  "experimental": {
+    "clash_api": {
+      "external_controller": "127.0.0.1:9090",
+      "external_ui": "ui",
+      "secret": "",
+      "external_ui_download_url": "https://github.com/Zephyruso/zashboard/archive/refs/heads/gh-pages.zip",
+      "external_ui_download_detour": "🚀 select",
+      "default_mode": "rule"
+    },
+    "cache_file": {
+      "enabled": true,
+      "store_fakeip": true,
+      "store_rdrc": true
+    }
+  }
+}
